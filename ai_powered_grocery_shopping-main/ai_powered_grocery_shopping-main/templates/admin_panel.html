@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Theme Variables (Consistent with others) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base Styles --- */
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        .container-fluid { /* Use fluid container for potentially wider admin content */
+             padding-left: 2rem;
+             padding-right: 2rem;
+        }
+
+        /* --- Page Header --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.8rem; /* Slightly smaller H1 for admin */
+        }
+
+        .header-actions .btn {
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+         .header-actions .btn i {
+            font-size: 1.1em;
+         }
+
+
+        /* --- Card Styling --- */
+        .card {
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-soft);
+            margin-bottom: 1.5rem;
+            background-color: #ffffff;
+            height: 100%; /* Make cards in the same row equal height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-body {
+            padding: 1.75rem; /* Slightly less padding */
+            flex-grow: 1; /* Allow body to grow */
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-gray);
+            font-size: 1.15rem;
+        }
+         .card-title i {
+             color: var(--primary-color);
+             font-size: 1.2em;
+         }
+
+        /* --- Form Styling --- */
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem; /* Smaller labels */
+            color: var(--dark-gray);
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--border-radius-md);
+            padding: 0.6rem 0.9rem; /* Smaller padding */
+            font-size: 0.95rem;
+            border: 1px solid var(--medium-gray);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+         .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+            outline: none;
+        }
+        .form-control[type=number] {
+            /* Adjust width if needed */
+        }
+        .form-select {
+             background-position: right 0.9rem center; /* Adjust arrow position */
+         }
+
+
+        /* --- Table Styling --- */
+        .table {
+            margin-bottom: 1rem; /* Space below tables */
+             font-size: 0.9rem; /* Smaller table font */
+        }
+        .table thead {
+             background-color: var(--light-gray);
+             color: var(--dark-gray);
+             font-weight: 600;
+             border-bottom: 2px solid var(--medium-gray);
+        }
+         .table th, .table td {
+            padding: 0.7rem 0.8rem; /* Smaller padding */
+            vertical-align: middle;
+        }
+        .table td .badge {
+            font-weight: 500;
+            padding: 0.4em 0.6em;
+        }
+        .table .action-link { /* Style links within tables if needed */
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .table .action-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* --- Product Card Grid --- */
+        .product-admin-card {
+             background-color: var(--light-gray); /* Slightly different background */
+             border: 1px solid var(--medium-gray);
+             box-shadow: none; /* Remove double shadow */
+        }
+        .product-admin-card .card-img-top {
+            height: 120px; /* Smaller image */
+            object-fit: contain; /* Use contain to see full image */
+            padding: 5px;
+            background-color: white; /* White background for image */
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .product-admin-card .card-body {
+            padding: 0.8rem; /* Smaller padding */
+        }
+        .product-admin-card .card-title {
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            border-bottom: none;
+            padding-bottom: 0;
+            font-weight: 600;
+             white-space: nowrap; /* Prevent wrapping */
+             overflow: hidden;
+             text-overflow: ellipsis; /* Add ellipsis if too long */
+             display: block;
+        }
+        .product-admin-card .card-text {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: var(--dark-gray);
+        }
+         .product-admin-card .btn-outline-danger {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+             width: 100%; /* Full width delete button */
+             margin-top: 0.5rem;
+         }
+
+        /* --- Buttons --- */
+        .btn {
+             border-radius: var(--border-radius-md);
+             transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+         .btn-outline-secondary {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+         }
+         .btn-outline-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+         }
+         .btn-outline-danger {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+         }
+         .btn-outline-danger:hover {
+             background-color: var(--danger-color);
+             color: white;
+         }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+             .page-header {
+                 flex-direction: column;
+                 align-items: flex-start;
+                 gap: 1rem;
+             }
+             .header-actions {
+                 width: 100%;
+                 display: flex;
+                 justify-content: space-between;
+             }
+             .container-fluid {
+                 padding-left: 1rem;
+                 padding-right: 1rem;
+             }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+
+        <div class="page-header">
+            <h1><i class="bi bi-shield-lock-fill"></i>Admin Panel</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Back to Store</a>
+                <a href="{{ url_for('view_orders') }}" class="btn btn-sm btn-primary"><i class="bi bi-receipt"></i> View All Orders</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
+
+        {# --- Flash Messages (Optional) --- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row">
+                    <div class="col-12">
+                        {% for category, message in messages %}
+                            {% set alert_category = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+                            {% set icon_class = 'bi-info-circle-fill' %}
+                            {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                            {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                            {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                            <div class="alert alert-{{ alert_category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <i class="bi {{ icon_class }} me-2"></i>
+                                <div>{{ message }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {# --- End Flash Messages --- #}
+
+        <div class="row g-4"> {# Add gutters #}
+            {# --- Add Product Column --- #}
+            <div class="col-lg-5 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-plus-circle-fill"></i>Add New Product</h5>
+                        <form method="post" action="{{ url_for('admin_panel') }}">
+                            {# Include CSRF token if using Flask-WTF #}
+                            {{ form.hidden_tag() if form and form.hidden_tag }}
+
+                            <div class="mb-3">
+                                <label for="product_name" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" id="product_name" name="product_name" placeholder="e.g., Organic Tomatoes" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="image_url" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://..." required>
+                            </div>
+                             <div class="row mb-3">
+                                <div class="col-6">
+                                     <label for="price_per_unit" class="form-label">Price</label>
+                                     <div class="input-group">
+                                         <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" id="price_per_unit" name="price_per_unit" step="0.01" placeholder="e.g., 50.00" required>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <select class="form-select" id="unit" name="unit" required>
+                                        <option value="" disabled selected>Select Unit</option>
+                                        <option value="kg">Kilogram (kg)</option>
+                                        <option value="gm">Gram (gm)</option>
+                                        <option value="liter">Liter</option>
+                                        <option value="ml">Milliliter (ml)</option>
+                                        <option value="piece">Piece</option>
+                                        <option value="bunch">Bunch</option>
+                                        <option value="unit">Unit</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="row mb-3">
+                                 <div class="col-6">
+                                      <label for="min_qty" class="form-label">Min. Qty</label>
+                                     <input type="number" class="form-control" id="min_qty" name="min_qty" step="any" value="1" placeholder="e.g., 0.5" required>
+                                 </div>
+                                 <div class="col-6">
+                                      <label for="category" class="form-label">Category</label>
+                                      <input type="text" class="form-control" id="category" name="category" placeholder="e.g., Vegetables">
+                                 </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-2"><i class="bi bi-check-lg"></i> Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>{# --- End Add Product Column --- #}
+
+            {# --- Recent Orders Column --- #}
+            <div class="col-lg-7 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-clock-history"></i>Recent Orders</h5>
+                        {% if orders %}
+                           <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Date</th>
+                                            <th>Customer</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {# Display maybe last 5 orders #}
+                                        {% for order in orders[:5] %}
+                                        <tr>
+                                            <td><a href="{{ url_for('view_order', order_id=order._id) }}" class="action-link" title="{{ order.order_id }}">{{ order.order_id[:6] }}..</a></td>
+                                             <td>{{ order.order_date.strftime('%d %b') }}</td>
+                                            <td>{{ order.customer_name }}</td>
+                                            <td>₹{{ "%.2f"|format(order.total | float) }}</td>
+                                            <td>
+                                                {# Use specific colors for statuses #}
+                                                {% set status_color = 'secondary' %}
+                                                {% if order.status == 'completed' %}{% set status_color = 'success' %}
+                                                {% elif order.status == 'processing' %}{% set status_color = 'primary' %}
+                                                {% elif order.status == 'shipped' %}{% set status_color = 'info' %}
+                                                {% elif order.status == 'cancelled' %}{% set status_color = 'danger' %}
+                                                {% elif order.status == 'pending' %}{% set status_color = 'warning' %}
+                                                {% endif %}
+                                                <span class="badge rounded-pill bg-{{ status_color }}">
+                                                    {{ order.status | title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('view_order', order_id=order._id) }}" class="btn btn-sm btn-outline-primary py-0 px-1" title="View Details"><i class="bi bi-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% if orders|length > 5 %}
+                                <a href="{{ url_for('view_orders') }}" class="btn btn-sm btn-outline-secondary mt-2 float-end">View All Orders <i class="bi bi-arrow-right"></i></a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted text-center mt-3">No orders have been placed yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>{# --- End Recent Orders Column --- #}
+        </div>
+
+        {# --- Current Products Section --- #}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-boxes"></i>Current Products ({{ products | length }})</h5>
+                {% if products %}
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3"> {# Adjust columns based on screen size #}
+                        {% for product in products %}
+                        <div class="col">
+                            <div class="card product-admin-card h-100">
+                                <a href="{{ url_for('product_detail', product_id=product._id) }}" target="_blank" title="View Product">
+                                    <img src="{{ product.image_url | default(url_for('static', filename='images/default.png')) }}" class="card-img-top" alt="{{ product.name }}">
+                                </a>
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title" title="{{ product.name }}">{{ product.name }}</h6>
+                                     <p class="card-text mb-1">₹{{ "%.2f"|format(product.price_per_unit | float) }}/{{ product.unit }}</p>
+                                     <p class="card-text"><small>Min: {{ product.min_qty }} {{ product.unit }}</small></p>
+                                    <form action="{{ url_for('delete_product', product_id=product._id) }}" method="POST" class="mt-auto" onsubmit="return confirm('Are you sure you want to delete {{ product.name }}?');">
+                                         <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                     <p class="text-muted text-center mt-3">No products added yet.</p>
+                 {% endif %}
+            </div>
+        </div>{# --- End Current Products Section --- #}
+
+        {# --- Unmatched Ingredients Section --- #}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-question-circle-fill"></i>Unmatched Ingredient Suggestions</h5>
+                {% if unmatched_suggestions|length > 0 %}
+                 <div class="table-responsive">
+                    <table class="table table-sm table-striped"> {# Added striped #}
+                        <thead>
+                            <tr>
+                                <th>Ingredient Name</th>
+                                <th>Suggested Quantity</th>
+                                <th>From Dish</th>
+                                <th>Action</th> {# Optional Action Column #}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for suggestion in unmatched_suggestions %}
+                            <tr>
+                                <td>{{ suggestion.ingredient | title }}</td>
+                                <td>{{ suggestion.quantity }}</td>
+                                <td>{{ suggestion.dish | title }}</td>
+                                <td>
+                                    {# Example Action: Button to quickly add this as a product #}
+                                     <button type="button" class="btn btn-sm btn-outline-success py-0 px-1" title="Add as Product"
+                                             onclick="populateAddProductForm('{{ suggestion.ingredient | title }}')">
+                                         <i class="bi bi-plus-lg"></i> Add
+                                     </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                 </div>
+                {% else %}
+                    <p class="text-muted text-center mt-3">No pending ingredient suggestions.</p>
+                {% endif %}
+            </div>
+        </div>{# --- End Unmatched Ingredients Section --- #}
+
+    </div> {# End Container #}
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    {# Optional JS for pre-filling add product form #}
+    <script>
+        function populateAddProductForm(ingredientName) {
+            const productNameInput = document.getElementById('product_name');
+            if (productNameInput) {
+                productNameInput.value = ingredientName;
+                productNameInput.focus(); // Focus the field
+                 // Optionally scroll to the form
+                 productNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+             // You could add more logic here to pre-fill category based on name etc.
+        }
+    </script>
+</body>
+</html>

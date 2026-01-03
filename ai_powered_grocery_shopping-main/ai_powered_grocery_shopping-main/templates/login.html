@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Consistent title -->
+    <title>Login | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Same CSS as the Register Page --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --text-color: #495057;
+            --border-radius-md: 8px;
+             --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1rem;
+            color: var(--text-color);
+        }
+
+        .form-container {
+             width: 100%;
+             max-width: 500px; /* Slightly smaller max-width for login */
+        }
+
+        .card {
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-strong);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .card-header h4 {
+            font-weight: 600;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+         .card-header h4 i {
+             margin-right: 0.75rem;
+             font-size: 1.3em;
+         }
+
+
+        .card-body {
+            padding: 2rem 2.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .form-control {
+            border-radius: var(--border-radius-md);
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--medium-gray);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+            outline: none;
+        }
+
+        .btn-primary { /* Overriding Bootstrap's default primary */
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+         .btn-primary:active {
+             background-color: #1e7e34;
+             border-color: #1c7430;
+             transform: scale(0.98);
+         }
+
+         .d-grid .btn {
+             width: 100%;
+         }
+
+        /* Link styling (Register/Forgot Password) */
+        .extra-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem; /* Slightly smaller */
+        }
+
+        .extra-links a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-left-width: 4px;
+        }
+        .alert i {
+            margin-right: 0.75rem;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .alert-danger { border-left-color: var(--bs-danger); }
+        .alert-success { border-left-color: var(--bs-success); }
+        .alert-warning { border-left-color: var(--bs-warning); }
+        .alert-info { border-left-color: var(--bs-info); }
+
+    </style>
+</head>
+<body>
+
+    <div class="form-container"> <!-- Wrapper for max-width -->
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <!-- Login icon -->
+                <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Login to Your EFFZEE Account</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                             {% set icon_class = 'bi-info-circle-fill' %} {# Default icon #}
+                            {% if category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                            {% if category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                            {% if category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <i class="bi {{ icon_class }}"></i>
+                                <div>{{ message }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    {{ form.hidden_tag() if form and form.hidden_tag }} {# Include CSRF token if using Flask-WTF #}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username or Email</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username or email" required>
+                    </div>
+                    <div class="mb-4"> <!-- Increased margin bottom -->
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                     <!-- Optional: Remember Me Checkbox -->
+                    <!-- <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                        <label class="form-check-label small" for="remember_me">Remember me</label>
+                    </div> -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-door-open-fill me-1"></i> Login
+                        </button>
+                    </div>
+                </form>
+                 <div class="mt-4 text-center extra-links"> <!-- Changed class -->
+                    <!-- Optional: Forgot Password Link -->
+                    <!-- <a href="#" class="me-3">Forgot Password?</a> | -->
+                    Don't have an account? <a href="{{ url_for('register') }}" class="ms-1">Sign up here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Bootstrap 5.3 JS bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

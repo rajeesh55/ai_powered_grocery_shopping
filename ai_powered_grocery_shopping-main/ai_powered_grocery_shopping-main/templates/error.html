@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title text-danger">Oops! Something went wrong.</h1>
+                <p class="card-text">{{ error }}</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Go Back Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

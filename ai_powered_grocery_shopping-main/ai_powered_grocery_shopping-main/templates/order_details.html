@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Theme Variables (Consistent with others) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0; /* Bootstrap Info Blue */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base Styles --- */
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        .container-fluid { /* Use fluid container for potentially wider admin content */
+             padding-left: 2rem;
+             padding-right: 2rem;
+        }
+
+        /* --- Page Header --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.8rem; /* Slightly smaller H1 for admin */
+        }
+
+        .header-actions .btn {
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+         .header-actions .btn i {
+            font-size: 1.1em;
+         }
+
+
+        /* --- Card Styling --- */
+        .card {
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-soft);
+            margin-bottom: 1.5rem; /* g-4 provides gutter, adjust margin if needed */
+            background-color: #ffffff;
+            height: 100%; /* Make cards in the same row equal height */
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Animation */
+        }
+        .card:hover {
+             transform: translateY(-3px); /* Subtle lift */
+             box-shadow: var(--box-shadow-strong);
+        }
+
+
+        .card-body {
+            padding: 1.75rem; /* Slightly less padding */
+            flex-grow: 1; /* Allow body to grow */
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-gray);
+            font-size: 1.15rem;
+        }
+         .card-title i {
+             /* color: var(--primary-color); */ /* Use specific icon colors */
+             font-size: 1.2em;
+         }
+         .card-title .bi-cash-coin { color: var(--primary-color); }
+         .card-title .bi-graph-up { color: var(--info-color); }
+         .card-title .bi-star-fill { color: var(--warning-color); }
+         .card-title .bi-plus-circle-fill { color: var(--primary-color); }
+         .card-title .bi-clock-history { color: var(--secondary-color); }
+         .card-title .bi-boxes { color: var(--info-color); }
+         .card-title .bi-question-circle-fill { color: var(--danger-color); }
+
+
+        /* --- Form Styling --- */
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem; /* Smaller labels */
+            color: var(--dark-gray);
+        }
+
+        .form-control, .form-select {
+            border-radius: var(--border-radius-md);
+            padding: 0.6rem 0.9rem; /* Smaller padding */
+            font-size: 0.95rem;
+            border: 1px solid var(--medium-gray);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+         .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+            outline: none;
+        }
+        .form-control[type=number] { }
+        .form-select {
+             background-position: right 0.9rem center; /* Adjust arrow position */
+         }
+
+
+        /* --- Table Styling --- */
+        .table {
+            margin-bottom: 1rem; /* Space below tables */
+             font-size: 0.9rem; /* Smaller table font */
+        }
+        .table thead {
+             background-color: var(--light-gray);
+             color: var(--dark-gray);
+             font-weight: 600;
+             border-bottom: 2px solid var(--medium-gray);
+        }
+         .table th, .table td {
+            padding: 0.7rem 0.8rem; /* Smaller padding */
+            vertical-align: middle;
+        }
+        .table td .badge {
+            font-weight: 500;
+            padding: 0.4em 0.6em;
+        }
+        .table .action-link { /* Style links within tables if needed */
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .table .action-link:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Product Card Grid --- */
+        .product-admin-card {
+             background-color: var(--light-gray); /* Slightly different background */
+             border: 1px solid var(--medium-gray);
+             box-shadow: none; /* Remove double shadow */
+             transition: none; /* Disable hover effect */
+        }
+        .product-admin-card:hover {
+             transform: none;
+             box-shadow: none;
+        }
+        .product-admin-card .card-img-top {
+            height: 120px; /* Smaller image */
+            object-fit: contain; /* Use contain to see full image */
+            padding: 5px;
+            background-color: white; /* White background for image */
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .product-admin-card .card-body {
+            padding: 0.8rem; /* Smaller padding */
+        }
+        .product-admin-card .card-title {
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            border-bottom: none;
+            padding-bottom: 0;
+            font-weight: 600;
+             white-space: nowrap; /* Prevent wrapping */
+             overflow: hidden;
+             text-overflow: ellipsis; /* Add ellipsis if too long */
+             display: block;
+             color: var(--text-color); /* Reset title color */
+        }
+        .product-admin-card .card-text {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            color: var(--dark-gray);
+        }
+         .product-admin-card .btn-outline-danger {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+             width: 100%; /* Full width delete button */
+             margin-top: 0.5rem;
+         }
+
+        /* --- Buttons --- */
+        .btn {
+             border-radius: var(--border-radius-md);
+             transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+         .btn-outline-secondary {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+         }
+         .btn-outline-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+         }
+         .btn-outline-danger {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+         }
+         .btn-outline-danger:hover {
+             background-color: var(--danger-color);
+             color: white;
+         }
+         .btn-outline-success {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+         }
+         .btn-outline-success:hover {
+             background-color: var(--primary-color);
+             color: white;
+         }
+
+        /* --- Chart Specific --- */
+        .chart-container {
+            position: relative;
+            /* height: 250px; /* Adjust as needed */
+            width: 100%;
+        }
+        .overview-metric {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .overview-metric .value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block; /* Ensure it takes its own line */
+            line-height: 1.2;
+        }
+        .overview-metric .label {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+             .page-header {
+                 flex-direction: column;
+                 align-items: flex-start;
+                 gap: 1rem;
+             }
+             .header-actions {
+                 width: 100%;
+                 display: flex;
+                 justify-content: space-between; /* Distribute buttons */
+                 flex-wrap: wrap; /* Allow wrapping on very small screens */
+                 gap: 0.5rem;
+             }
+             .header-actions .btn {
+                 flex-grow: 1; /* Allow buttons to grow */
+                 min-width: 120px; /* Prevent excessive shrinking */
+             }
+             .container-fluid {
+                 padding-left: 1rem;
+                 padding-right: 1rem;
+             }
+             .overview-metric .value {
+                 font-size: 1.5rem;
+             }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+
+        <div class="page-header">
+            <h1><i class="bi bi-shield-lock-fill"></i>Admin Panel</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Store</a>
+                <a href="{{ url_for('view_orders') }}" class="btn btn-sm btn-primary"><i class="bi bi-receipt"></i> Orders</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
+
+        {# --- Flash Messages --- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row">
+                    <div class="col-12">
+                        {% for category, message in messages %}
+                            {% set alert_category = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+                            {% set icon_class = 'bi-info-circle-fill' %}
+                            {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                            {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                            {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                            <div class="alert alert-{{ alert_category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <i class="bi {{ icon_class }} me-2"></i>
+                                <div>{{ message }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+        {# --- End Flash Messages --- #}
+
+        {# --- Row 1: Overview & Quick Actions --- #}
+        <div class="row g-4">
+             {# --- Sales Overview --- #}
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-cash-coin"></i>Sales Overview</h5>
+                        <div class="row text-center">
+                             <div class="col-6 overview-metric border-end">
+                                 {# --- REPLACE WITH ACTUAL DATA --- #}
+                                 <span class="value">₹{{ total_revenue | default('0.00') }}</span>
+                                 <span class="label">Total Revenue</span>
+                             </div>
+                             <div class="col-6 overview-metric">
+                                 {# --- REPLACE WITH ACTUAL DATA --- #}
+                                 <span class="value">{{ total_orders_count | default(0) }}</span>
+                                 <span class="label">Total Orders</span>
+                             </div>
+                              {# Add more metrics if needed (e.g., Avg Order Value) #}
+                        </div>
+                         <hr>
+                         <p class="text-muted small text-center mb-0">Summary of all time sales</p> {# Adjust timeframe description #}
+                    </div>
+                </div>
+            </div>
+
+            {# --- Add Product Column --- #}
+            <div class="col-lg-4 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-plus-circle-fill"></i>Add New Product</h5>
+                        <form method="post" action="{{ url_for('admin_panel') }}">
+                            {{ form.hidden_tag() if form and form.hidden_tag }} {# CSRF token #}
+
+                            <div class="mb-2"> {# Reduced margin #}
+                                <label for="product_name" class="form-label">Product Name</label>
+                                <input type="text" class="form-control form-control-sm" id="product_name" name="product_name" placeholder="e.g., Organic Tomatoes" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="image_url" class="form-label">Image URL</label>
+                                <input type="url" class="form-control form-control-sm" id="image_url" name="image_url" placeholder="https://..." required>
+                            </div>
+                             <div class="row mb-2 g-2">
+                                <div class="col-sm-6">
+                                     <label for="price_per_unit" class="form-label">Price</label>
+                                     <div class="input-group input-group-sm">
+                                         <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control form-control-sm" id="price_per_unit" name="price_per_unit" step="0.01" placeholder="50.00" required>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <select class="form-select form-select-sm" id="unit" name="unit" required>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="kg">kg</option>
+                                        <option value="gm">gm</option>
+                                        <option value="liter">liter</option>
+                                        <option value="ml">ml</option>
+                                        <option value="piece">piece</option>
+                                        <option value="bunch">bunch</option>
+                                        <option value="unit">unit</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="row mb-3 g-2">
+                                 <div class="col-sm-6">
+                                      <label for="min_qty" class="form-label">Min. Qty</label>
+                                     <input type="number" class="form-control form-control-sm" id="min_qty" name="min_qty" step="any" value="1" placeholder="0.5" required>
+                                 </div>
+                                 <div class="col-sm-6">
+                                      <label for="category" class="form-label">Category</label>
+                                      <input type="text" class="form-control form-control-sm" id="category" name="category" placeholder="Vegetables">
+                                 </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-check-lg"></i> Add Product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>{# --- End Add Product Column --- #}
+
+            {# --- Recent Orders Column --- #}
+            <div class="col-lg-4 col-md-12"> {# Made full width on medium #}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-clock-history"></i>Recent Orders</h5>
+                        {% if orders and orders|length > 0 %}
+                           <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Date</th>
+                                            <th>Customer</th>
+                                            <th>Total</th>
+                                            <th>Status</th>
+                                            <th></th> {# Action col #}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders[:5] %} {# Limit to 5 recent #}
+                                        <tr>
+                                            <td><a href="{{ url_for('view_order', order_id=order._id) }}" class="action-link" title="{{ order.order_id }}">{{ order.order_id[:6] }}..</a></td>
+                                             <td>{{ order.order_date.strftime('%d %b') }}</td>
+                                            <td>{{ order.customer_name | truncate(15) }}</td> {# Truncate name #}
+                                            <td>₹{{ "%.2f"|format(order.total | float) }}</td>
+                                            <td>
+                                                {% set status_color = 'secondary' %}
+                                                {% if order.status == 'completed' %}{% set status_color = 'success' %}
+                                                {% elif order.status == 'processing' %}{% set status_color = 'primary' %}
+                                                {% elif order.status == 'shipped' %}{% set status_color = 'info' %}
+                                                {% elif order.status == 'cancelled' %}{% set status_color = 'danger' %}
+                                                {% elif order.status == 'pending' %}{% set status_color = 'warning' %}
+                                                {% endif %}
+                                                <span class="badge rounded-pill bg-{{ status_color }}">
+                                                    {{ order.status | title }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="{{ url_for('view_order', order_id=order._id) }}" class="btn btn-sm btn-outline-primary py-0 px-1" title="View Details"><i class="bi bi-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% if orders|length > 5 %}
+                                <a href="{{ url_for('view_orders') }}" class="btn btn-sm btn-outline-secondary mt-3 float-end">View All <i class="bi bi-arrow-right"></i></a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted text-center mt-3 mb-0">No orders have been placed yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>{# --- End Recent Orders Column --- #}
+        </div>
+
+        {# --- Row 2: Charts and Reports --- #}
+        <div class="row g-4 mt-2">
+             {# --- Sales Trend Chart --- #}
+             <div class="col-lg-6 col-md-12">
+                 <div class="card">
+                     <div class="card-body">
+                         <h5 class="card-title"><i class="bi bi-graph-up"></i>Sales Trend (Last 7 Days)</h5>
+                         <div class="chart-container" style="height: 280px;">
+                             <canvas id="salesTrendChart"></canvas>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             {# --- Top Products Chart --- #}
+             <div class="col-lg-6 col-md-12">
+                 <div class="card">
+                     <div class="card-body">
+                         <h5 class="card-title"><i class="bi bi-star-fill"></i>Top Selling Products</h5>
+                          <div class="chart-container" style="height: 280px;">
+                             <canvas id="topProductsChart"></canvas>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        {# --- Row 3: Current Products & Unmatched Suggestions --- #}
+         <div class="row g-4 mt-2">
+             {# --- Current Products Section --- #}
+            <div class="col-lg-8"> {# Wider column for products #}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-boxes"></i>Current Products ({{ products | length }})</h5>
+                        {% if products and products|length > 0 %}
+                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3"> {# Adjusted columns #}
+                                {% for product in products %}
+                                <div class="col">
+                                    <div class="card product-admin-card h-100">
+                                        <a href="{{ url_for('product_detail', product_id=product._id) }}" target="_blank" title="View Product">
+                                            <img src="{{ product.image_url | default(url_for('static', filename='images/default.png')) }}" class="card-img-top" alt="{{ product.name }}">
+                                        </a>
+                                        <div class="card-body d-flex flex-column">
+                                            <h6 class="card-title" title="{{ product.name }}">{{ product.name }}</h6>
+                                             <p class="card-text mb-1">₹{{ "%.2f"|format(product.price_per_unit | float) }}/{{ product.unit }}</p>
+                                             <p class="card-text"><small>Min: {{ product.min_qty }} {{ product.unit }}</small></p>
+                                            <form action="{{ url_for('delete_product', product_id=product._id) }}" method="POST" class="mt-auto" onsubmit="return confirm('Are you sure you want to delete {{ product.name }}?');">
+                                                 <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                             <p class="text-muted text-center mt-3">No products added yet.</p>
+                         {% endif %}
+                    </div>
+                </div>
+            </div>{# --- End Current Products Section --- #}
+
+             {# --- Unmatched Ingredients Section --- #}
+            <div class="col-lg-4"> {# Narrower column #}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-question-circle-fill"></i>Unmatched Suggestions</h5>
+                        {% if unmatched_suggestions and unmatched_suggestions|length > 0 %}
+                         <div class="table-responsive">
+                            <table class="table table-sm table-striped table-hover mb-0"> {# Added striped/hover #}
+                                <thead>
+                                    <tr>
+                                        <th>Ingredient</th>
+                                        <th>Qty</th>
+                                        <th>Dish</th>
+                                        <th></th> {# Action col #}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for suggestion in unmatched_suggestions[:8] %} {# Limit display #}
+                                    <tr>
+                                        <td title="{{ suggestion.ingredient | title }}">{{ suggestion.ingredient | title | truncate(15) }}</td>
+                                        <td>{{ suggestion.quantity }}</td>
+                                        <td title="{{ suggestion.dish | title }}">{{ suggestion.dish | title | truncate(10) }}</td>
+                                        <td class="text-end">
+                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1" title="Use to Add Product"
+                                                     onclick="populateAddProductForm('{{ suggestion.ingredient | title | e }}')"> {# Added |e for escaping #}
+                                                 <i class="bi bi-plus-lg"></i>
+                                             </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                         </div>
+                          {% if unmatched_suggestions|length > 8 %}
+                              <p class="text-muted small text-center mt-2 mb-0">Showing first 8 suggestions...</p>
+                          {% endif %}
+                        {% else %}
+                            <p class="text-muted text-center mt-3 mb-0">No pending ingredient suggestions.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>{# --- End Unmatched Ingredients Section --- #}
+        </div>
+
+
+    </div> {# End Container #}
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    {# Charting and Helper JS #}
+    <script>
+        // Helper function to pre-fill add product form
+        function populateAddProductForm(ingredientName) {
+            const productNameInput = document.getElementById('product_name');
+            if (productNameInput) {
+                productNameInput.value = ingredientName;
+                // Scroll to the Add Product card and focus
+                const addProductCard = productNameInput.closest('.card');
+                if (addProductCard) {
+                    addProductCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                productNameInput.focus();
+            }
+        }
+
+        // --- Chart.js Configuration ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+            const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim();
+            const infoColor = getComputedStyle(document.documentElement).getPropertyValue('--info-color').trim();
+            const warningColor = getComputedStyle(document.documentElement).getPropertyValue('--warning-color').trim();
+            const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color').trim();
+
+             // --- IMPORTANT: Replace dummy data with data from Flask ---
+             // Example: Use Jinja's |tojson filter
+             // const salesLabels = {{ sales_labels | tojson }};
+             // const salesData = {{ sales_data | tojson }};
+             // const topProductNames = {{ top_product_names | tojson }};
+             // const topProductCounts = {{ top_product_counts | tojson }};
+
+            // Dummy Data (Replace with real data passed from backend)
+            const dummySalesLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const dummySalesData = [120, 190, 150, 280, 220, 310, 250];
+            const dummyTopProductNames = ['Organic Bananas', 'Fresh Apples', 'Whole Milk', 'Brown Eggs', 'Spinach Bunch'];
+            const dummyTopProductCounts = [55, 48, 40, 35, 30]; // Could be units sold or revenue
+
+            // 1. Sales Trend Chart (Line)
+            const salesCtx = document.getElementById('salesTrendChart');
+            if (salesCtx) {
+                new Chart(salesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dummySalesLabels, // Replace with salesLabels
+                        datasets: [{
+                            label: 'Sales (₹)',
+                            data: dummySalesData, // Replace with salesData
+                            borderColor: primaryColor,
+                            backgroundColor: primaryColor + '33', // Semi-transparent fill
+                            tension: 0.3, // Smoothes the line
+                            fill: true,
+                            pointBackgroundColor: primaryColor,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e9ecef' // Lighter grid lines
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false // Hide vertical grid lines
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend if only one dataset
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                callbacks: {
+                                     label: function(context) {
+                                         return ` Sales: ₹${context.parsed.y.toFixed(2)}`;
+                                     }
+                                 }
+                            }
+                        },
+                        animation: {
+                             duration: 800, // Animation duration
+                             easing: 'easeInOutQuad'
+                        }
+                    }
+                });
+            }
+
+            // 2. Top Products Chart (Bar)
+            const productsCtx = document.getElementById('topProductsChart');
+            if (productsCtx) {
+                 new Chart(productsCtx, {
+                    type: 'bar', // Could also be 'pie' or 'doughnut'
+                    data: {
+                        labels: dummyTopProductNames, // Replace with topProductNames
+                        datasets: [{
+                            label: 'Units Sold', // Or 'Revenue'
+                            data: dummyTopProductCounts, // Replace with topProductCounts
+                            backgroundColor: [ // Use a palette or function for more colors
+                                primaryColor + 'CC', // Use alpha for transparency
+                                infoColor + 'CC',
+                                warningColor + 'CC',
+                                secondaryColor + 'CC',
+                                dangerColor + 'CC',
+                             ],
+                            borderColor: [
+                                primaryColor,
+                                infoColor,
+                                warningColor,
+                                secondaryColor,
+                                dangerColor,
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 4, // Rounded bars
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         indexAxis: 'y', // Horizontal bars - often better for long labels
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e9ecef'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Usually hide legend for bar charts like this
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                callbacks: {
+                                    label: function(context) {
+                                        // Adjust label based on what data represents (units, revenue)
+                                        return ` ${context.dataset.label}: ${context.parsed.x}`;
+                                    }
+                                }
+                            }
+                        },
+                         animation: {
+                             duration: 800,
+                             easing: 'easeInOutQuad'
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

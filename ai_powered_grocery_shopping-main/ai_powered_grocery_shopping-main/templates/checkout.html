@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Theme Variables (Consistent with others) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base Styles --- */
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 2.5rem; /* More space at the top */
+            padding-bottom: 4rem;
+        }
+
+        .container {
+             max-width: 1140px; /* Limit container width */
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+        h1 i {
+            margin-right: 0.75rem;
+            vertical-align: middle; /* Align icon better */
+        }
+
+        /* --- Card Styling --- */
+        .card {
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-soft);
+            margin-bottom: 1.5rem; /* Ensure spacing between cards if stacked */
+            overflow: hidden; /* Ensure content respects border-radius */
+            background-color: #ffffff;
+            /* Animation */
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+         /* Stagger animation */
+        .col-md-6:nth-child(1) .card { animation-delay: 0.1s; }
+        .col-md-6:nth-child(2) .card { animation-delay: 0.2s; }
+        .col-md-6:nth-child(2) .mt-3 { /* Delay button fade-in */
+             animation: fadeIn 0.6s ease-out 0.3s forwards;
+             opacity: 0;
+         }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-body {
+            padding: 2rem; /* Generous padding */
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            color: var(--dark-gray);
+        }
+         .card-title i {
+             margin-right: 0.75rem;
+             color: var(--primary-color);
+             font-size: 1.3em;
+         }
+
+        /* --- Shipping Form Styling --- */
+        .shipping-form .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .shipping-form .form-control {
+            border-radius: var(--border-radius-md);
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--medium-gray);
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .shipping-form .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+            outline: none;
+        }
+         .shipping-form textarea.form-control {
+             resize: vertical; /* Allow vertical resize only */
+             min-height: 100px;
+         }
+
+        .shipping-form .btn-primary { /* Theme primary button */
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.9rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-radius: var(--border-radius-md);
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .shipping-form .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .shipping-form .btn-primary:active {
+             transform: scale(0.98);
+         }
+
+
+        /* --- Order Summary Styling --- */
+        .order-summary .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem; /* Slightly smaller item text */
+            border-bottom: 1px dashed var(--medium-gray); /* Dashed separator */
+            padding-bottom: 0.8rem;
+        }
+         .order-summary .summary-item:last-of-type {
+            border-bottom: none; /* No border for the last item */
+         }
+
+        .order-summary .item-name {
+            color: var(--dark-gray);
+            flex-grow: 1; /* Allow name to take space */
+            margin-right: 1rem; /* Space between name and price */
+        }
+         .order-summary .item-quantity {
+             color: var(--secondary-color);
+             font-size: 0.85rem;
+             margin-left: 0.5rem; /* Space before quantity */
+         }
+
+        .order-summary .item-price {
+            font-weight: 500;
+             white-space: nowrap; /* Prevent price wrapping */
+        }
+
+        .order-summary hr {
+            margin: 1.5rem 0;
+            border-top: 1px solid var(--dark-gray); /* Stronger hr before total */
+        }
+
+        .order-summary .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 1.3rem; /* Larger total */
+            color: var(--primary-color); /* Highlight total price */
+        }
+        .order-summary .total-row span:first-child {
+             color: var(--text-color); /* Label in default text color */
+        }
+
+        /* --- Back to Cart Button --- */
+        .back-to-cart-btn {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+             display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .back-to-cart-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+         /* --- Alert Styling (Flash Messages) --- */
+         .flash-alert { /* Add a class for specific targeting if needed */
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-left-width: 4px;
+            margin: 0 auto 1.5rem auto; /* Center alert */
+            max-width: 800px; /* Limit width */
+        }
+        .flash-alert i {
+            margin-right: 0.75rem;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        .alert-danger { border-left-color: var(--bs-danger); }
+        .alert-success { border-left-color: var(--bs-success); }
+        .alert-warning { border-left-color: var(--bs-warning); }
+        .alert-info { border-left-color: var(--bs-info); }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1><i class="bi bi-credit-card-2-front-fill"></i> Secure Checkout</h1>
+
+        {# --- Flash Messages (Optional) --- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set alert_category = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+                    {% set icon_class = 'bi-info-circle-fill' %}
+                    {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                    {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                    {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                    <div class="alert alert-{{ alert_category }} flash-alert" role="alert">
+                        <i class="bi {{ icon_class }}"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {# --- End Flash Messages --- #}
+
+
+        <div class="row g-4"> {# Add gutter spacing between columns #}
+            {# --- Shipping Information Column --- #}
+            <div class="col-lg-7 col-md-6">
+                <div class="card shipping-form">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-truck"></i>Shipping Information</h5>
+                        <form method="post" action="{{ url_for('checkout') }}">
+                            {# Include CSRF token if using Flask-WTF #}
+                            {{ form.hidden_tag() if form and form.hidden_tag }}
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ current_user.name if current_user and current_user.is_authenticated else '' }}" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email if current_user and current_user.is_authenticated else '' }}" placeholder="you@example.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                     <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="e.g., +919876543210" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="address" class="form-label">Full Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="4" placeholder="Street address, City, State, Pincode" required></textarea>
+                            </div>
+                            {# Consider adding fields for City, State, Pincode separately for better validation #}
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                <i class="bi bi-send-check-fill"></i> Place Your Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div> {# --- End Shipping Information Column --- #}
+
+            {# --- Order Summary Column --- #}
+            <div class="col-lg-5 col-md-6">
+                <div class="card order-summary">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-receipt-cutoff"></i>Order Summary</h5>
+                        {% if cart %}
+                            {% for item in cart %}
+                            <div class="summary-item">
+                                <span class="item-name">
+                                    {{ item.product_name | title }}
+                                     {# Use processed quantity value/unit from Option 2 (best practice) #}
+                                     {% if item.quantity_value and item.quantity_unit %}
+                                        <span class="item-quantity">({{ item.quantity_value }} {{ item.quantity_unit }})</span>
+                                     {% elif item.quantity %} {# Fallback if not pre-processed #}
+                                         <span class="item-quantity">({{ item.quantity }})</span>
+                                     {% endif %}
+                                </span>
+                                <span class="item-price">₹{{ "%.2f"|format(item.price | float) }}</span>
+                            </div>
+                            {% endfor %}
+                            <hr>
+                            <div class="total-row">
+                                <span>Total</span>
+                                <span>₹{{ "%.2f"|format(total | float) }}</span>
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted">Your cart is empty.</p>
+                         {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('view_cart') }}" class="btn btn-outline-secondary w-100 back-to-cart-btn">
+                        <i class="bi bi-arrow-left-circle"></i> Back to Cart
+                    </a>
+                </div>
+            </div> {# --- End Order Summary Column --- #}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

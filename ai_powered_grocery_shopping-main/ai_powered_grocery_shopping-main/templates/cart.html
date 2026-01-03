@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Theme Variables (Consistent with others) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --danger-color: #dc3545;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base Styles --- */
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 2rem; /* Add some space at the top */
+            padding-bottom: 4rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        h1 i {
+            margin-right: 0.5rem;
+        }
+
+        /* --- Cart Item Styling --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            margin-bottom: 1.5rem; /* Spacing between items */
+            padding: 1.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow-soft);
+            border: 1px solid var(--medium-gray);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Animation */
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden for animation */
+        }
+         /* Stagger animation */
+        {% if cart %}
+            {% for item in cart %}
+            .cart-item:nth-child({{ loop.index }}) {
+                animation-delay: {{ loop.index * 0.08 }}s;
+            }
+            {% endfor %}
+        {% endif %}
+
+
+        .cart-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        .item-image {
+            width: 90px; /* Slightly smaller */
+            height: 90px;
+            object-fit: cover;
+            margin-right: 1.5rem;
+            border-radius: var(--border-radius-md); /* Rounded image */
+            border: 1px solid var(--medium-gray);
+        }
+
+        .item-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-details h5 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+             color: var(--text-color);
+        }
+
+        .item-details .recipe-origin {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-bottom: 0.75rem;
+        }
+         .item-details .recipe-origin i {
+             color: var(--primary-color);
+         }
+
+        .item-price {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-top: auto; /* Push price to the bottom if needed */
+            text-align: right; /* Align price to the right */
+        }
+
+        /* --- Quantity Control --- */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Space between elements */
+            margin-top: 0.5rem; /* Space above controls */
+            margin-bottom: 0.5rem;
+        }
+
+        .quantity-control .form-control {
+            width: 70px; /* Specific width */
+            text-align: center;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.95rem;
+            border-radius: var(--border-radius-md);
+        }
+        /* Hide default number input spinners (optional) */
+        .quantity-control input[type=number]::-webkit-inner-spin-button,
+        .quantity-control input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .quantity-control input[type=number] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
+
+        .quantity-control .unit-label {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            min-width: 30px; /* Ensure space for units like 'kg' */
+        }
+
+        .quantity-control .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .quantity-control .btn i {
+            font-size: 1.1em; /* Slightly larger icon */
+        }
+
+        .remove-item-btn {
+            margin-left: auto; /* Push remove button to the far right */
+            color: var(--danger-color);
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+             transition: color 0.2s ease;
+        }
+         .remove-item-btn:hover {
+             color: #a71d2a; /* Darker red */
+         }
+
+
+        /* --- Order Summary Card --- */
+        .order-summary-card {
+            background-color: #ffffff;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow-soft);
+            border: 1px solid var(--medium-gray);
+            padding: 1.5rem;
+            position: sticky; /* Make it sticky */
+            top: 2rem; /* Sticky offset from top */
+        }
+        .order-summary-card .card-title {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 1rem;
+        }
+        .order-summary-card .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        .order-summary-card .summary-item span:first-child {
+            color: var(--dark-gray);
+        }
+        .order-summary-card .summary-total {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            border-top: 1px solid var(--medium-gray);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .order-summary-card .btn {
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+        .order-summary-card .btn:active {
+            transform: scale(0.98);
+        }
+        .order-summary-card .btn-success { /* Primary checkout button */
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .order-summary-card .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .order-summary-card .btn-outline-secondary {
+             border-color: var(--secondary-color);
+             color: var(--secondary-color);
+         }
+        .order-summary-card .btn-outline-secondary:hover {
+             background-color: var(--secondary-color);
+             color: white;
+         }
+
+
+        /* --- Empty Cart Styling --- */
+        .empty-cart-message {
+            background-color: #ffffff;
+            border-radius: var(--border-radius-lg);
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: var(--box-shadow-soft);
+            border: 1px dashed var(--medium-gray); /* Dashed border */
+            margin-top: 2rem;
+        }
+        .empty-cart-message i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+        .empty-cart-message p {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            margin-bottom: 1.5rem;
+        }
+        .empty-cart-message .btn {
+            font-weight: 600;
+        }
+
+
+        /* --- Alert Styling (Flash Messages) --- */
+         .alert {
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-left-width: 4px;
+            margin-bottom: 1.5rem; /* Space below flash messages */
+        }
+        .alert i {
+            margin-right: 0.75rem;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        .alert-danger { border-left-color: var(--bs-danger); }
+        .alert-success { border-left-color: var(--bs-success); }
+        .alert-warning { border-left-color: var(--bs-warning); }
+        .alert-info { border-left-color: var(--bs-info); }
+
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .item-image {
+                margin-right: 0;
+                margin-bottom: 1rem;
+                width: 100%; /* Full width image on small screens */
+                height: 150px; /* Adjust height */
+            }
+            .item-details {
+                width: 100%;
+            }
+             .item-price {
+                text-align: left; /* Align left on small screens */
+                margin-top: 0.75rem;
+            }
+             .quantity-control {
+                 flex-wrap: wrap; /* Allow wrapping */
+                 margin-bottom: 1rem;
+             }
+             .remove-item-btn {
+                 margin-left: 0; /* Reset margin */
+                 align-self: flex-end; /* Put remove button bottom right */
+                 margin-top: -2.5rem; /* Adjust positioning */
+             }
+
+             .order-summary-card {
+                 position: static; /* Remove sticky on small screens */
+                 margin-top: 2rem;
+             }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1><i class="bi bi-cart-fill"></i> Your Shopping Cart</h1>
+
+        {# --- Flash Messages --- #}
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% set alert_category = 'warning' if category == 'message' else category %} {# Default to warning if no category #}
+                            {% set icon_class = 'bi-info-circle-fill' %} {# Default icon #}
+                            {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                            {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                            {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                            <div class="alert alert-{{ alert_category }} alert-dismissible fade show" role="alert">
+                                <i class="bi {{ icon_class }}"></i>
+                                <div>{{ message }}</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {# --- End Flash Messages --- #}
+
+        {% if cart %}
+            <div class="row">
+                {# --- Cart Items Column --- #}
+                <div class="col-lg-8">
+                    {% for item in cart %}
+                    <div class="cart-item" id="cart-item-{{ item.id }}">
+                        <img src="{{ item.image_url | default(url_for('static', filename='images/default.png')) }}" alt="{{ item.product_name }}" class="item-image">
+                        <div class="item-details">
+                            <div> {# Wrapper for top details #}
+                                <h5>{{ item.product_name | title }}</h5>
+                                {% if item.ingredient_name %}
+                                <p class="recipe-origin"><i class="bi bi-check-circle-fill"></i> <small>For recipe: {{ item.ingredient_name | title }}</small></p>
+                                {% endif %}
+                            </div>
+
+                            {# --- Quantity Controls --- #}
+                            <div class="quantity-control">
+                                <form method="post" action="{{ url_for('update_cart') }}" class="d-flex align-items-center flex-grow-1">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <label for="quantity-{{ item.id }}" class="visually-hidden">Quantity:</label>
+                                    {# Handle potential quantity formats '1 kg', '2', '0.5 units' #}
+                                    {# --- Corrected Section --- #}
+                                    {% set qty_str = item.quantity | string %} {# Ensure it's a string #}
+                                    {% set qty_parts = qty_str.split(' ', 1) %} {# Call split() as a method #}
+                                    
+                                    {# Safely get the numeric part, try converting to float, default if needed #}
+                                    {% set quantity_value = (qty_parts[0] | float) if qty_parts and qty_parts[0] else (item.min_qty | default(1)) %}
+                                    
+                                    {# Safely get the unit part if it exists (list has > 1 element), else use item.unit or empty #}
+                                    {% set quantity_unit = qty_parts[1] if qty_parts | length > 1 else (item.unit | default('')) %}
+                                    
+                                    {# --- The input fields using the new variables --- #}
+                                    <input type="number" name="quantity" id="quantity-{{ item.id }}"
+                                           value="{{ quantity_value }}"
+                                           min="{{ item.min_qty | default(0.1) }}" step="any" {# Use 'any' for flexibility #}
+                                           class="form-control me-2" required>
+                                    <span class="unit-label">{{ quantity_unit }}</span>
+                                    {# --- End Corrected Section --- #}
+                                    <input type="number" name="quantity" id="quantity-{{ item.id }}"
+                                           value="{{ quantity_value }}"
+                                           min="{{ item.min_qty | default(0.1) }}" step="any" {# Use 'any' for flexibility with units #}
+                                           class="form-control me-2" required>
+                                    <span class="unit-label">{{ quantity_unit }}</span>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2" title="Update Quantity">
+                                         <i class="bi bi-arrow-clockwise"></i> Update
+                                    </button>
+                                </form>
+                                <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" class="remove-item-btn" title="Remove Item">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </div>
+                            {# --- End Quantity Controls --- #}
+
+                            <p class="item-price mt-auto">₹{{ "%.2f"|format(item.price | float) }}</p> {# Ensure price is float for formatting #}
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>{# --- End Cart Items Column --- #}
+
+                {# --- Order Summary Column --- #}
+                <div class="col-lg-4">
+                    <div class="card order-summary-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Summary</h5>
+                            <div class="summary-item">
+                                <span>Subtotal ({{ cart|length }} items)</span>
+                                <span>₹{{ "%.2f"|format(total | float) }}</span> {# Format total #}
+                            </div>
+                            <div class="summary-item">
+                                <span>Delivery Fee</span>
+                                <span>₹0.00</span> {# Placeholder #}
+                            </div>
+                            <div class="summary-item summary-total">
+                                <span>Total Amount</span>
+                                <span>₹{{ "%.2f"|format(total | float) }}</span> {# Format total #}
+                            </div>
+
+                            <a href="{{ url_for('checkout') }}" class="btn btn-success w-100 mt-4">
+                                <i class="bi bi-credit-card-fill"></i> Proceed to Checkout
+                            </a>
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="bi bi-arrow-left-circle"></i> Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                </div>{# --- End Order Summary Column --- #}
+            </div>
+        {% else %}
+            {# --- Empty Cart Message --- #}
+             <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="empty-cart-message">
+                        <i class="bi bi-cart-x"></i>
+                        <p>Your shopping cart is currently empty.</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                           <i class="bi bi-shop me-1"></i> Start Shopping Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{# /partials/_flash_messages.html #}
+{#
+    Renders Flask flash messages using Bootstrap 5 alerts.
+    Include this in your base or specific templates like:
+    {% include 'partials/_flash_messages.html' %}
+
+    It automatically handles different message categories ('success', 'danger', 'warning', 'info')
+    and assigns appropriate Bootstrap alert classes and icons.
+#}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="row mb-3"> {# Add some margin-bottom to space it from content below #}
+            <div class="col-12">
+                {# Loop through all flashed messages #}
+                {% for category, message in messages %}
+
+                    {# Determine Bootstrap alert class based on Flask category #}
+                    {# Default to 'info' if category is not recognized #}
+                    {% set alert_category = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+
+                    {# Map alert category to a Bootstrap Icon class #}
+                    {% set icon_class = 'bi-info-circle-fill' %} {# Default icon #}
+                    {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                    {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                    {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+
+                    {# Generate the Bootstrap Alert HTML #}
+                    <div class="alert alert-{{ alert_category }} alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+                        {# Icon #}
+                        <i class="bi {{ icon_class }} me-2 fs-5"></i> {# Slightly larger icon #}
+
+                        {# Message Text #}
+                        <div class="flex-grow-1">{{ message }}</div>
+
+                        {# Close Button #}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}

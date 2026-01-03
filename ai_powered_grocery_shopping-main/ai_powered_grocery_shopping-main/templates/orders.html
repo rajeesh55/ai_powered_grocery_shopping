@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+            border-radius: 4px; /* Optional: slightly rounded corners */
+        }
+        .quantity-input {
+            width: 80px; /* Adjust width as needed */
+        }
+        .action-buttons .btn {
+            margin-bottom: 5px; /* Add space between buttons if they wrap */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 mb-5">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+            </ol>
+        </nav>
+
+        <h1 class="mb-4">Your Shopping Cart</h1>
+
+        {# --- Display Flashed Messages --- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {# --- End Flashed Messages --- #}
+
+        {% if cart and cart is iterable and cart|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Image</th>
+                            <th scope="col">Product</th>
+                            <th scope="col" class="text-center">Quantity</th>
+                            <th scope="col" class="text-end">Price</th>
+                            <th scope="col" class="text-center">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart %}
+                        <tr>
+                            <td>
+                                <img src="{{ item.image_url | default(url_for('static', filename='images/default.png')) }}"
+                                     alt="{{ item.product_name | default('Product Image') }}"
+                                     class="cart-item-image">
+                            </td>
+                            <td>
+                                <strong>{{ item.product_name | default('N/A') }}</strong>
+                                {% if item.ingredient_name and item.ingredient_name != item.product_name %}
+                                    <br><small class="text-muted">For: {{ item.ingredient_name }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="{{ url_for('update_cart') }}" method="post" class="d-flex flex-column align-items-center action-buttons">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <div class="input-group input-group-sm mb-1" style="max-width: 180px;">
+                                        {# Attempt to extract numeric value for the input field #}
+                                        {% set current_qty_val = item.quantity.split(' ')[0] | default(item.min_qty | default(1)) %}
+                                        <input type="number"
+                                               name="quantity"
+                                               value="{{ current_qty_val }}"
+                                               min="{{ item.min_qty | default(0) }}"
+                                               {# Use 'any' for step to allow decimals freely, server validates #}
+                                               step="any"
+                                               class="form-control quantity-input text-center"
+                                               required
+                                               aria-label="Item quantity">
+                                        <span class="input-group-text">{{ item.unit | default('unit') }}</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary w-100" style="max-width: 180px;">Update</button>
+                                    <small class="text-muted mt-1">Min: {{ item.min_qty | default(0) }} {{ item.unit | default('unit') }}</small>
+                                </form>
+                            </td>
+                            <td class="text-end">
+                                ₹{{ item.price | round(2) | default('0.00') }}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ url_for('remove_from_cart', item_id=item.id) }}"
+                                   class="btn btn-sm btn-outline-danger"
+                                   aria-label="Remove {{ item.product_name }} from cart"
+                                   title="Remove Item">×</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <div class="row justify-content-end">
+                <div class="col-md-4">
+                    <h4 class="text-end">Subtotal: ₹{{ total | round(2) | default('0.00') }}</h4>
+                    <p class="text-end text-muted small">Shipping & taxes calculated at checkout.</p>
+                    <div class="d-grid gap-2 mt-3">
+                         <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg">Proceed to Checkout</a>
+                         <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">Your cart is empty!</h4>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <hr>
+                <p class="mb-0">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">Start Shopping</a>
+                </p>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" integrity="sha512-i9cEfJwUwViEPFKdC1ntbtDsTbckvnf3luWflPrkhEU8RTrUETRKQZfLIsBhlAGDfkCm1Y/1IioBhnF/07iVcA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>

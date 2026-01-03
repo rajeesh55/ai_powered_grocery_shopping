@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Ingredient Generator | EFFZEE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3730a3;
+            
+            /* Secondary Colors */
+            --secondary-color: #f72585;
+            --secondary-light: #ff4d6d;
+            --secondary-dark: #b5179e;
+            
+            /* Accent Colors */
+            --accent-1: #7209b7;
+            --accent-2: #4cc9f0;
+            --accent-3: #fb8500;
+            
+            /* Success States */
+            --success-color: #2ecc71;
+            --success-light: #7ae582;
+            --success-dark: #2d6a4f;
+            
+            /* Error States */
+            --error-color: #e63946;
+            --error-light: #ff758f;
+            --error-dark: #c1121f;
+            
+            /* Warning States */
+            --warning-color: #fca311;
+            --warning-light: #ffba08;
+            --warning-dark: #cc8b00;
+            
+            /* Neutral Colors */
+            --dark-color: #1a1b25;
+            --gray-900: #2d3142;
+            --gray-800: #4f5d75;
+            --gray-700: #767b91;
+            --gray-600: #9ba0b3;
+            --gray-500: #bfc0c0;
+            --gray-400: #d8d9d9;
+            --gray-300: #e5e5e5;
+            --gray-200: #f2f2f2;
+            --gray-100: #f8f9fa;
+            
+            /* Background Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9ff;
+            --bg-tertiary: #eef2ff;
+            
+            /* Text Colors */
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-700);
+            --text-muted: var(--gray-600);
+            
+            /* Border Radius */
+            --border-radius-lg: 16px;
+            --border-radius-md: 12px;
+            --border-radius-sm: 8px;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px rgba(67, 97, 238, 0.07);
+            --shadow-md: 0 4px 20px rgba(67, 97, 238, 0.1);
+            --shadow-lg: 0 8px 30px rgba(67, 97, 238, 0.15);
+            --shadow-hover: 0 10px 40px rgba(67, 97, 238, 0.2);
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        body {
+            padding-top: 70px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Enhanced Animations */
+        .fade-in {
+            animation: fadeInAnimation 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInAnimation {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Modernized Notification Bar */
+        .notification-bar {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0.7rem 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .notification-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: scroll 35s linear infinite;
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.7rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            padding: 0.7rem 1.2rem !important;
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-normal);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background-color: var(--bg-tertiary);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: var(--bg-tertiary);
+            font-weight: 600;
+        }
+
+        /* Enhanced Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(26, 27, 37, 0.7), rgba(26, 27, 37, 0.7)), 
+                        url('https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            padding: 8rem 0;
+            margin-bottom: 4rem;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(67, 97, 238, 0.3),
+                rgba(114, 9, 183, 0.3),
+                rgba(247, 37, 133, 0.3));
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Enhanced Buttons */
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary-color), var(--secondary-light));
+            border: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-color), var(--success-light));
+            border: none;
+        }
+
+        /* Enhanced Cards */
+        .card {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-img-top {
+            transition: transform var(--transition-normal);
+        }
+
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        /* Form Elements */
+        .form-control {
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--border-radius-md);
+            border: 2px solid var(--gray-300);
+            transition: all var(--transition-normal);
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Checkboxes and Radio Buttons */
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            transition: all var(--transition-normal);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Recipe Cards */
+        .recipe-card {
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .recipe-card img {
+            transition: transform var(--transition-normal);
+        }
+
+        .recipe-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Loading States */
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tooltips and Badges */
+        .tooltip {
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            padding: 0.5em 1em;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Responsive Typography */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            .hero-subtitle {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary-color), var(--accent-1));
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--primary-dark), var(--accent-1));
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-overlay p {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        /* Notification Bar Animation */
+        .notification-content {
+            transition: opacity 0.5s ease;
+        }
+
+        /* Enhanced Card Animations */
+        .card {
+            transform-origin: center bottom;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+        }
+
+        /* Button Animation */
+        .btn {
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Form Focus Animation */
+        .form-control:focus {
+            transform: translateY(-2px);
+        }
+
+        /* Ingredient Item Animation */
+        .ingredient-item {
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .ingredient-item:hover {
+            transform: translateX(8px);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Enhanced Carousel */
+        .recipe-carousel {
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 4rem;
+        }
+
+        .carousel-item {
+            height: 500px;
+            background-color: var(--dark-color);
+        }
+
+        .carousel-item img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.8);
+            transition: transform 0.5s ease, filter 0.5s ease;
+        }
+
+        .carousel-item:hover img {
+            transform: scale(1.02);
+            filter: brightness(0.7);
+        }
+
+        .carousel-caption {
+            background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.8));
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: left;
+        }
+
+        .carousel-caption h5 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-caption p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        /* Enhanced Offer Cards */
+        .offer-card {
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+
+        .offer-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .offer-card img {
+            transition: transform 0.5s ease;
+            height: 250px;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.95);
+        }
+
+        .offer-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .offer-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 2;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .offer-card .card-body {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .offer-card .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark-color);
+        }
+
+        .offer-card .card-text {
+            color: var(--text-primary);
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .offer-card .btn {
+            transition: all 0.3s ease;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .offer-card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .carousel-item {
+                height: 400px;
+            }
+
+            .carousel-caption {
+                padding: 1.5rem;
+            }
+
+            .carousel-caption h5 {
+                font-size: 1.5rem;
+            }
+
+            .carousel-caption p {
+                font-size: 1rem;
+            }
+
+            .offer-card img {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Notification Bar -->
+    <div class="notification-bar">
+        <div class="container">
+            <div class="notification-content" aria-hidden="true"> <!-- Duplicate content for seamless scroll -->
+                <i class="bi bi-megaphone-fill me-2"></i>
+                Special Offer: Get 15% off on all organic products this week! Use code ORGANIC15 at checkout.
+                <span class="mx-3">|</span>
+                Free delivery on orders above ₹500.
+                <span class="mx-3">|</span>
+                New products added daily - check out our fresh arrivals!
+                 <span class="mx-3">|</span> <!-- Added separator -->
+                 <i class="bi bi-megaphone-fill me-2"></i>
+                Special Offer: Get 15% off on all organic products this week! Use code ORGANIC15 at checkout.
+                <span class="mx-3">|</span>
+                Free delivery on orders above ₹500.
+                <span class="mx-3">|</span>
+                New products added daily - check out our fresh arrivals!
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-basket3-fill me-1"></i> EFFZEE
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'index' else '' }}" aria-current="page" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'browse_products' else '' }}" href="{{ url_for('browse_products') }}">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'recipes' else '' }}" href="{{ url_for('recipes') }}">Recipes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'about' else '' }}" href="{{ url_for('about') }}">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if session.user_id %}
+                        <!-- Logged In User Links -->
+                        <li class="nav-item">
+                            <a href="{{ url_for('view_cart') }}" class="nav-link position-relative {{ 'active' if request.endpoint == 'view_cart' else '' }}">
+                                <i class="bi bi-cart-fill"></i> Cart
+                                {% set cart_items = session.get('cart', []) %}
+                                {% set cart_count = cart_items | length %}
+                                {% if cart_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ cart_count }}
+                                    <span class="visually-hidden">items in cart</span>
+                                </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                           <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint in ['dashboard', 'profile'] else '' }}" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                               <i class="bi bi-person-circle"></i> {{ session.name }}
+                           </a>
+                           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
+                               <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                               <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="bi bi-gear-fill me-2"></i>Profile</a></li>
+                               <li><hr class="dropdown-divider"></li>
+                               {% if session.get('admin') %}
+                                   <li><a class="dropdown-item text-danger fw-bold" href="{{ url_for('admin_panel') }}"><i class="bi bi-shield-lock-fill me-2"></i>Admin Panel</a></li>
+                                   <li><hr class="dropdown-divider"></li>
+                               {% endif %}
+                               <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                           </ul>
+                        </li>
+                    {% else %}
+                        <!-- Logged Out User Links -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'active' if request.endpoint == 'login' else '' }}" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'active' if request.endpoint == 'register' else '' }}" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- End Navigation Bar -->
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Recipe Ingredient Generator</h1>
+            <p class="hero-subtitle">Plan your meals effortlessly and shop for the freshest ingredients, all in one place.</p>
+            <a href="#recipe-generator" class="btn btn-primary mt-3 shadow">
+                <i class="bi bi-stars me-1"></i> Let's Get Cooking!
+            </a>
+        </div>
+    </section>
+
+    <!-- Recipe Carousel -->
+    <div class="container">
+        <div id="recipeCarousel" class="carousel slide recipe-carousel" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#recipeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#recipeCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#recipeCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" class="d-block w-100" alt="Fresh Ingredients">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Fresh Seasonal Ingredients</h5>
+                        <p>Handpicked quality ingredients for your perfect meal.</p>
+                        <a href="#recipe-generator" onclick="document.getElementById('dish_name').value='Seasonal Salad';" class="btn btn-light btn-sm">Get Ingredients</a>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1606787366850-de6330128bfc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" class="d-block w-100" alt="Mediterranean Cuisine">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Mediterranean Delights</h5>
+                        <p>Explore the flavors of the Mediterranean with our fresh ingredients.</p>
+                        <a href="#recipe-generator" onclick="document.getElementById('dish_name').value='Mediterranean Bowl';" class="btn btn-light btn-sm">Get Ingredients</a>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1543352634-99a5d50ae78e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" class="d-block w-100" alt="Baking Essentials">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Baking Essentials</h5>
+                        <p>Premium ingredients for your perfect baking adventure.</p>
+                        <a href="#recipe-generator" onclick="document.getElementById('dish_name').value='Artisan Bread';" class="btn btn-light btn-sm">Get Ingredients</a>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recipeCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#recipeCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Special Offers Section -->
+    <section class="offers-section">
+        <div class="container">
+            <h2 class="text-center mb-5 fw-bold"><i class="bi bi-tag-fill me-2 text-success"></i> Today's Fresh Deals</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card offer-card h-100">
+                        <span class="offer-badge">25% OFF</span>
+                        <img src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                             class="card-img-top" alt="Organic Vegetables"
+                             style="height: 250px; object-fit: cover; object-position: center;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><i class="bi bi-basket me-1"></i> Farm Fresh Organics</h5>
+                            <p class="card-text small text-muted">Premium organic produce sourced directly from local farms.</p>
+                            <a href="{{ url_for('browse_products', category='Vegetables') }}" class="btn btn-outline-success btn-sm mt-2">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card offer-card h-100">
+                        <span class="offer-badge">BOGO FREE</span>
+                        <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                             class="card-img-top" alt="Premium Spices"
+                             style="height: 250px; object-fit: cover; object-position: center;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><i class="bi bi-pepper me-1"></i> Artisanal Spices</h5>
+                            <p class="card-text small text-muted">Handcrafted spice blends for the perfect flavor profile.</p>
+                            <a href="{{ url_for('browse_products', category='Spices') }}" class="btn btn-outline-success btn-sm mt-2">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card offer-card h-100">
+                        <span class="offer-badge">FREE DELIVERY</span>
+                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                             class="card-img-top" alt="Fresh Bakery"
+                             style="height: 250px; object-fit: cover; object-position: center;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><i class="bi bi-cake2 me-1"></i> Artisan Bakery</h5>
+                            <p class="card-text small text-muted">Freshly baked breads and pastries delivered to your door.</p>
+                            <a href="{{ url_for('browse_products', category='Bakery') }}" class="btn btn-outline-success btn-sm mt-2">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <div class="container mt-5" id="recipe-generator">
+
+        <!-- Flash Messages -->
+        <div class="row justify-content-center flash-messages">
+            <div class="col-lg-10 col-md-12">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        {% set alert_category = 'info' if category == 'message' else category %}
+                        {% set icon_class = 'bi-info-circle-fill' %} {# Default icon #}
+                        {% if alert_category == 'success' %}{% set icon_class = 'bi-check-circle-fill' %}{% endif %}
+                        {% if alert_category == 'danger' %}{% set icon_class = 'bi-exclamation-triangle-fill' %}{% endif %}
+                        {% if alert_category == 'warning' %}{% set icon_class = 'bi-exclamation-circle-fill' %}{% endif %}
+                        <div class="alert alert-{{ alert_category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="bi {{ icon_class }} me-2 flex-shrink-0" style="font-size: 1.2em;"></i>
+                            <div>{{ message }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        <!-- End Flash Messages -->
+
+        <!-- Results Section - Show at top when available -->
+        {% if show_results and ingredients %}
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Generated Recipe for {{ dish_name }} ({{ servings }} servings)</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Ingredients:</h5>
+                        <ul class="list-group">
+                            {% for ingredient in ingredients %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ ingredient.name }}
+                                <span class="badge bg-primary rounded-pill">{{ ingredient.quantity }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        {% if matched_products %}
+                        <h5>Available Products:</h5>
+                        <div class="list-group">
+                            {% for product in matched_products %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <img src="{{ product.image_url }}" alt="{{ product.product_name }}" class="product-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <span>{{ product.product_name }}</span>
+                                    </div>
+                                    <form action="{{ url_for('add_to_cart') }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="product_name" value="{{ product.product_name }}">
+                                        <input type="hidden" name="ingredient_name" value="{{ product.ingredient_name }}">
+                                        <input type="hidden" name="quantity" value="{{ product.quantity }}">
+                                        <input type="hidden" name="image_url" value="{{ product.image_url }}">
+                                        <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recipe Generation Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Generate Recipe</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dish_name" class="form-label">What would you like to cook?</label>
+                            <input type="text" class="form-control" id="dish_name" name="dish_name" value="{{ dish_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="servings" class="form-label">Number of Servings</label>
+                            <input type="number" class="form-control" id="servings" name="servings" value="{{ servings }}" min="1" max="20" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Dietary Preferences</label>
+                        <div class="row">
+                            {% for option in dietary_options %}
+                            <div class="col-md-3 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="dietary_preferences" value="{{ option }}" id="diet_{{ loop.index }}">
+                                    <label class="form-check-label" for="diet_{{ loop.index }}">
+                                        {{ option }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Generate Recipe</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Display Ingredients if available -->
+        {% if ingredients %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Ingredients for {{ dish_name }} ({{ servings }} servings)</h4>
+                {% if request.form.getlist('dietary_preferences') %}
+                <p class="text-muted mb-0">
+                    Dietary Preferences: {{ request.form.getlist('dietary_preferences')|join(', ') }}
+                </p>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-list-stars me-2 text-success"></i>Ingredients List
+                    </h3>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                        <i class="bi bi-printer-fill me-1"></i> Print List
+                    </button>
+                </div>
+                <div class="row">
+                    {% for ingredient in ingredients %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="ingredient-item">
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong class="d-block">{{ ingredient.name | title }}</strong>
+                                        <small class="text-muted">{{ ingredient.quantity }}</small>
+                                    </div>
+                                    <a href="{{ url_for('browse_products') }}?search={{ ingredient.name }}" 
+                                       class="btn btn-sm btn-outline-success ms-2" 
+                                       title="Find {{ ingredient.name | title }} in store">
+                                        <i class="bi bi-search"></i> Shop
+                                    </a>
+                                </div>
+                                {% if ingredient.get('alternatives') %}
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        <i class="bi bi-arrow-return-right"></i> Alternatives:
+                                    </small>
+                                    <ul class="list-unstyled ms-3 mb-0">
+                                        {% for alt in ingredient.alternatives %}
+                                        <li>
+                                            <small class="text-muted">
+                                                <i class="bi bi-dash"></i> {{ alt }}
+                                                <a href="{{ url_for('browse_products') }}?search={{ alt.split('(')[0] }}" 
+                                                   class="btn btn-sm btn-link py-0 px-1">
+                                                    <i class="bi bi-search"></i>
+                                                </a>
+                                            </small>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# --- Display Section for Generated Recipe & Products --- #}
+        {% if ingredients or matched_products or error_message %}
+        <div class="row justify-content-center mb-5 fade-in" id="results"> {# Add ID for anchor and fade-in #}
+            <div class="col-lg-10 col-md-12">
+                <div class="card results-card mb-4"> {# Added results-card class #}
+                    <div class="card-body p-lg-4">
+
+                        {# Display Error if Generation Failed #}
+                        {% if error_message %}
+                           <div class="alert alert-danger d-flex align-items-center" role="alert">
+                              <i class="bi bi-emoji-frown-fill me-3" style="font-size: 1.5rem;"></i>
+                              <div>
+                                  <h4 class="alert-heading">Oops! Generation Failed</h4>
+                                  <p class="mb-0">{{ error_message }} Please check your input or try a different dish.</p>
+                              </div>
+                           </div>
+                        {% endif %}
+
+                        {# Display Matched Products for the Recipe #}
+                        {% if matched_products %}
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                            <h3 class="mb-2 mb-md-0"><i class="bi bi-cart-check-fill me-2 text-success"></i>Shop These Ingredients Now</h3>
+                            <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-2">{{ matched_products|length }} Recommended Items</span>
+                        </div>
+
+                        <!-- Display ingredients and products -->
+                        <div class="row g-4">
+                            {% for item in matched_products %}
+                            <div class="col d-flex"> {# Use d-flex to ensure cards stretch #}
+                                <div class="card product-card w-100"> {# Added w-100 #}
+                                     <a href="{{ url_for('product_detail', product_id=item.product_id) }}">
+                                         <img src="{{ item.image_url }}" class="card-img-top product-image" alt="{{ item.product_name }}">
+                                     </a>
+                                    <div class="card-body d-flex flex-column"> {# Added d-flex flex-column #}
+                                        <div class="flex-grow-1"> {# Make top part grow #}
+                                            <h5 class="product-title mb-1">
+                                                <a href="{{ url_for('product_detail', product_id=item.product_id) }}">
+                                                    {{ item.product_name }}
+                                                </a>
+                                            </h5>
+                                            <p class="card-text text-muted mb-1">
+                                                <small><i class="bi bi-check-circle text-success"></i> For: {{ item.ingredient_name | title }}</small>
+                                            </p>
+                                            <p class="card-text text-muted mb-2"><small>Suggested: {{ item.quantity }}</small></p>
+                                            <p class="product-price mb-0">₹{{ "%.2f"|format(item.price) }}</p>
+                                            <p class="product-unit"><small>per {{ item.unit }}</small></p>
+                                        </div>
+                                        {# Add to Cart Form for Matched Products #}
+                                        <form method="post" action="{{ url_for('add_to_cart') }}" class="mt-3">
+                                            <input type="hidden" name="ingredient_name" value="{{ item.ingredient_name }}">
+                                            <input type="hidden" name="product_name" value="{{ item.product_name }}">
+                                            <input type="hidden" name="quantity" value="{{ item.quantity }}">
+                                            <input type="hidden" name="image_url" value="{{ item.image_url }}">
+                                            <input type="hidden" name="product_id" value="{{ item.product_id | string }}">
+                                            <button type="submit" class="btn btn-success w-100 btn-sm">
+                                                <i class="bi bi-cart-plus-fill"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Cooking Instructions Section -->
+                        {% if instructions %}
+                        <div class="mt-5">
+                            <h3 class="mb-4"><i class="bi bi-journal-text me-2 text-primary"></i>Cooking Instructions</h3>
+                            <div class="card">
+                                <div class="card-body">
+                                    <ol class="list-group list-group-flush list-group-numbered">
+                                        {% for step in instructions %}
+                                        <li class="list-group-item border-0 d-flex align-items-start">
+                                            <div class="ms-2">
+                                                <p class="mb-0">{{ step }}</p>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% elif ingredients and not error_message %}
+                        <div class="alert alert-info mt-3 d-flex align-items-center" role="alert">
+                            <i class="bi bi-lightbulb-fill me-2 flex-shrink-0"></i>
+                            <div>
+                                We generated the ingredients list! While we couldn't automatically match all items to our current products, you can easily <a href="{{ url_for('browse_products') }}" class="alert-link">browse our shop</a> or use the 'Shop' buttons next to each ingredient.
+                            </div>
+                        </div>
+                        {% endif %}
+                        {# End Matched Products Display #}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {# --- END: Display Section for Generated Recipe & Products --- #}
+
+
+        {# --- START: All Products Section (Featured) --- #}
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+                    <h2 class="mb-0 fw-bold"><i class="bi bi-shop-window me-2 text-success"></i> Featured Fresh Products</h2>
+                    <a href="{{ url_for('browse_products') }}" class="btn btn-outline-success">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i> View All Products
+                    </a>
+                </div>
+
+                {% if products %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-4">
+                    {# Display only a few featured products, e.g., first 8 #}
+                    {% for product in products[:8] %}
+                    <div class="col d-flex"> {# Use d-flex to ensure cards stretch #}
+                        <div class="card product-card w-100"> {# Added w-100 #}
+                             <a href="{{ url_for('product_detail', product_id=product._id) }}">
+                                 <img src="{{ product.image_url | default(url_for('static', filename='images/default.png')) }}" class="card-img-top product-image" alt="{{ product.name }}">
+                             </a>
+                            <div class="card-body d-flex flex-column"> {# Added d-flex flex-column #}
+                                <div class="flex-grow-1"> {# Make top part grow #}
+                                    <h5 class="product-title mb-1">
+                                        <a href="{{ url_for('product_detail', product_id=product._id) }}">
+                                            {{ product.name }}
+                                        </a>
+                                    </h5>
+                                    {% if product.category %}
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill mb-2 fw-normal">{{ product.category }}</span>
+                                    {% endif %}
+                                    <p class="product-price mb-0">₹{{ "%.2f"|format(product.price_per_unit) }}</p>
+                                    <p class="product-unit mb-2"><small>per {{ product.unit }}</small></p>
+                                    <p class="card-text text-muted mb-2"><small>Min. order: {{ product.min_qty }} {{ product.unit }}</small></p>
+                                </div>
+                                <form method="post" action="{{ url_for('add_to_cart') }}" class="mt-3">
+                                    <input type="hidden" name="product_name" value="{{ product.name }}">
+                                    <input type="hidden" name="product_id" value="{{ product._id | string }}">
+                                    <input type="hidden" name="image_url" value="{{ product.image_url | default(url_for('static', filename='images/default.png')) }}">
+                                     {# Use min_qty and unit for the default quantity to add #}
+                                    <input type="hidden" name="quantity" value="{{ product.min_qty }} {{ product.unit }}">
+                                    <button type="submit" class="btn btn-outline-success w-100 btn-sm">
+                                        <i class="bi bi-cart-plus"></i> Add {{ product.min_qty }} {{ product.unit }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                 <div class="text-center mb-5">
+                    <a href="{{ url_for('browse_products') }}" class="btn btn-success btn-lg">
+                       <i class="bi bi-arrow-right-circle-fill me-1"></i> Explore All Products
+                    </a>
+                 </div>
+
+                {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="bi bi-info-circle me-1"></i> No products found in the store yet. Check back soon or contact support!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {# --- END: All Products Section --- #}
+
+    </div> <!-- End container -->
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        <div class="container py-5">
+            <div class="row gy-4">
+                <div class="col-lg-3 col-md-6">
+                    <h5><i class="bi bi-basket3-fill me-2"></i> EFFZEE</h5>
+                    <p class="small">Your partner for fresh ingredients and culinary inspiration. Quality delivered.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="Pinterest"><i class="bi bi-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('browse_products') }}">Shop All</a></li>
+                        <li><a href="#">Recipes</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                 <div class="col-lg-3 col-md-6">
+                    <h5>Popular Categories</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="{{ url_for('browse_products', category='Vegetables') }}">Fresh Vegetables</a></li>
+                        <li><a href="{{ url_for('browse_products', category='Fruits') }}">Seasonal Fruits</a></li>
+                        <li><a href="{{ url_for('browse_products', category='Dairy') }}">Dairy & Eggs</a></li>
+                        <li><a href="{{ url_for('browse_products', category='Bakery') }}">Bakery Goods</a></li>
+                        <li><a href="{{ url_for('browse_products', category='Pantry') }}">Pantry Staples</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h5>Stay Updated</h5>
+                    <p class="small">Subscribe for weekly recipes, special offers, and fresh tips!</p>
+                    <form class="mb-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control form-control-sm" placeholder="Enter your email" aria-label="Email for newsletter">
+                            <button class="btn btn-success btn-sm" type="button">Subscribe</button>
+                        </div>
+                    </form>
+                    <h5 class="mt-3">Need Help?</h5>
+                    <p class="small mb-1"><i class="bi bi-envelope-fill me-2"></i> support@effzee.com</p>
+                    <p class="small"><i class="bi bi-telephone-fill me-2"></i> +91 93459 30926</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row bottom-links">
+                <div class="col-md-6 text-center text-md-start small">
+                    <p class="mb-0">© {% set current_year = 2024 %}{{ current_year }} EFFZEE. All Rights Reserved.</p> {# Replace 2024 with dynamic year in backend #}
+                </div>
+                <div class="col-md-6 text-center text-md-end small">
+                    <a href="{{ url_for('admin_login') }}" class="me-3">Admin Login</a>
+                    <a href="#" class="me-3">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- End Footer -->
+
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <!-- Custom JS (Optional) -->
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Auto-scroll to results if they exist
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultsElement = document.querySelector('.card-header.bg-success');
+            if (resultsElement) {
+                setTimeout(() => {
+                    resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+
+        // Add fade-in animation to elements
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .recipe-form, .results-card, .ingredient-item').forEach((el) => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+
+        // Add loading spinner
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-overlay';
+            loadingDiv.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p class="mt-3">Generating your recipe...</p>
+            `;
+            document.body.appendChild(loadingDiv);
+        }
+
+        function hideLoading() {
+            const loadingDiv = document.querySelector('.loading-overlay');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // Add form submission loading state
+        document.querySelector('form')?.addEventListener('submit', () => {
+            showLoading();
+        });
+
+        // Add tooltip initialization
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Add dynamic notification bar
+        const notifications = [
+            "🌟 Get personalized recipe recommendations!",
+            "🛒 Find the freshest ingredients in your area",
+            "🥗 Discover healthy alternatives for your favorite recipes",
+            "👨‍🍳 Join our cooking community today!"
+        ];
+        
+        let currentNotification = 0;
+        const notificationContent = document.querySelector('.notification-content');
+        
+        function updateNotification() {
+            notificationContent.style.opacity = '0';
+            setTimeout(() => {
+                notificationContent.textContent = notifications[currentNotification];
+                notificationContent.style.opacity = '1';
+                currentNotification = (currentNotification + 1) % notifications.length;
+            }, 500);
+        }
+        
+        setInterval(updateNotification, 5000);
+    </script>
+
+</body>
+</html>

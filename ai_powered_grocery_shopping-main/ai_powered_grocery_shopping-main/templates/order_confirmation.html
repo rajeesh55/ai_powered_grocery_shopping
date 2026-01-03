@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation | EFFZEE</title>
+    <!-- Using Bootstrap 5.3 for consistency -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Include Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Link to your external CSS if preferred -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+
+    <style>
+        /* --- Theme Variables (Consistent with others) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --box-shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base Styles --- */
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 3rem; /* Space at the top */
+            padding-bottom: 4rem;
+        }
+
+        .container {
+             max-width: 800px; /* Limit width for readability */
+        }
+
+        /* --- Card Styling --- */
+        .confirmation-card {
+            background-color: #ffffff;
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-strong); /* Stronger shadow for emphasis */
+            padding: 2.5rem 3rem; /* Generous padding */
+            margin-top: 1rem;
+            /* Animation */
+            animation: popIn 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            80% {
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.0);
+            }
+        }
+
+        .confirmation-icon {
+            font-size: 5rem; /* Large icon */
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: block; /* Ensure it takes block space */
+             /* Subtle bounce animation */
+            animation: bounceIn 1s ease-out 0.5s forwards;
+             opacity: 0;
+        }
+
+         @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.1); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+
+        .confirmation-card .card-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 2.2rem; /* Larger title */
+        }
+
+        .confirmation-card .lead { /* Subtitle */
+            color: var(--dark-gray);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-meta {
+            background-color: var(--light-gray);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 2rem;
+            border: 1px solid var(--medium-gray);
+            text-align: left; /* Align meta text left */
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: space-between; /* Space out items */
+             gap: 1rem; /* Space between items */
+        }
+        .order-meta p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+             color: var(--secondary-color);
+        }
+        .order-meta strong {
+             color: var(--text-color);
+             margin-left: 0.5rem;
+        }
+
+        /* --- Section Headings --- */
+        .section-heading {
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block; /* Fit content width */
+            color: var(--dark-gray);
+        }
+
+        /* --- Order Summary Table --- */
+        .table {
+            margin-top: 1rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius-md);
+            overflow: hidden; /* Clip content to rounded corners */
+            box-shadow: var(--box-shadow-soft);
+        }
+        .table thead {
+             background-color: var(--light-gray);
+             color: var(--dark-gray);
+             font-weight: 600;
+             border-bottom: 2px solid var(--medium-gray);
+        }
+        .table th, .table td {
+            padding: 0.9rem 1rem; /* Comfortable padding */
+            vertical-align: middle;
+            text-align: left;
+        }
+         .table td:last-child, .table th:last-child {
+            text-align: right; /* Align price/total right */
+         }
+
+         .table tbody tr:last-child td {
+            border-bottom: none; /* No bottom border on last row */
+         }
+
+        .table tfoot {
+            font-weight: 700;
+            border-top: 2px solid var(--medium-gray);
+            font-size: 1.1rem;
+        }
+        .table tfoot th:last-child {
+             color: var(--primary-color); /* Highlight total */
+         }
+
+        /* --- Shipping Details --- */
+        .shipping-details {
+            background-color: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            margin-top: 1rem;
+            text-align: left; /* Align text left */
+             border: 1px solid var(--medium-gray);
+             line-height: 1.6;
+        }
+         .shipping-details strong {
+             display: block; /* Name on its own line */
+             margin-bottom: 0.3rem;
+             color: var(--text-color);
+             font-weight: 600;
+         }
+         .shipping-details p {
+             margin-bottom: 0;
+             color: var(--secondary-color);
+         }
+
+        /* --- Continue Shopping Button --- */
+        .continue-shopping-btn {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            border-radius: var(--border-radius-md);
+             display: inline-flex; /* Use inline-flex for icon alignment */
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+        .continue-shopping-btn:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .continue-shopping-btn:active {
+             transform: scale(0.98);
+         }
+
+         /* --- Responsive --- */
+         @media (max-width: 768px) {
+             .confirmation-card {
+                 padding: 1.5rem;
+             }
+             .confirmation-card .card-title {
+                 font-size: 1.8rem;
+             }
+             .confirmation-icon {
+                 font-size: 4rem;
+             }
+              .order-meta {
+                 justify-content: flex-start; /* Align left on small screens */
+             }
+         }
+          @media (max-width: 576px) {
+             .table th, .table td {
+                 padding: 0.7rem 0.5rem;
+                 font-size: 0.9rem;
+             }
+              .order-meta p {
+                 font-size: 0.9rem;
+             }
+             .confirmation-card {
+                 padding: 1.5rem 1rem;
+             }
+         }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4 mb-5">
+        <div class="confirmation-card text-center">
+            <i class="bi bi-check-circle-fill confirmation-icon"></i>
+            <h1 class="card-title">Thank You for Your Order!</h1>
+            <p class="lead">Your fresh ingredients are on their way.</p>
+
+            {# --- Order Meta Information --- #}
+            <div class="order-meta">
+                <p>Order ID: <strong>{{ order.order_id }}</strong></p>
+                <p>Order Placed: <strong>{{ order.order_date.strftime('%d %b %Y, %I:%M %p') }}</strong></p> {# Nicer format #}
+            </div>
+
+            {# --- Order Summary Section --- #}
+            <h3 class="section-heading">Order Summary</h3>
+            <div class="table-responsive"> {# Make table scrollable on small screens #}
+                <table class="table table-bordered table-hover"> {# Added bordered/hover classes #}
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.cart_items %}
+                        <tr>
+                            <td>{{ item.product_name | title }}</td>
+                            <td>
+                                {# Use processed quantity value/unit if available #}
+                                {% if item.quantity_value and item.quantity_unit %}
+                                   {{ item.quantity_value }} {{ item.quantity_unit }}
+                                {% else %} {# Fallback #}
+                                   {{ item.quantity }}
+                                {% endif %}
+                            </td>
+                            <td>₹{{ "%.2f"|format(item.price | float) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="text-end">Total Amount</th>
+                            <th>₹{{ "%.2f"|format(order.total | float) }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            {# --- Shipping Details Section --- #}
+            <h4 class="section-heading">Shipping To</h4>
+            <div class="shipping-details">
+                <strong>{{ order.customer_name }}</strong>
+                <p>{{ order.customer_address }}</p>
+                <p><i class="bi bi-telephone-fill me-2"></i>{{ order.customer_phone }}</p>
+                <p><i class="bi bi-envelope-fill me-2"></i>{{ order.customer_email }}</p>
+            </div>
+
+            <a href="{{ url_for('index') }}" class="btn btn-primary mt-4 continue-shopping-btn">
+                <i class="bi bi-basket3-fill"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

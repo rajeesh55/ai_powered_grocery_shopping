@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders | EFFZEE Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Link to your admin CSS (can reuse admin_panel styles or create a specific one) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}"> {# Adjust path if needed #}
+     <style>
+        /* --- Theme Variables (Copy from admin_panel.html if not using external CSS) --- */
+        :root {
+            --primary-color: #28a745; /* Success Green */
+            --secondary-color: #6c757d; /* Medium Gray */
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0; /* Bootstrap Info Blue */
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-color: #212529; /* Darker text */
+            --border-radius-md: 8px;
+            --border-radius-lg: 15px;
+            --box-shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+         body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            padding-top: 1rem; /* Reduced top padding */
+            padding-bottom: 4rem;
+        }
+        .container-fluid {
+             padding-left: 1.5rem;
+             padding-right: 1.5rem;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.7rem;
+        }
+        .header-actions .btn {
+            font-weight: 500;
+        }
+         .card {
+            border-radius: var(--border-radius-lg);
+            border: none;
+            box-shadow: var(--box-shadow-soft);
+            margin-bottom: 1.5rem;
+            background-color: #ffffff;
+        }
+        .card-body { padding: 1.5rem; }
+        .card-title { font-weight: 600; margin-bottom: 1.25rem; }
+        .table thead { background-color: var(--light-gray); color: var(--dark-gray); font-weight: 600; border-bottom: 2px solid var(--medium-gray); }
+        .table th, .table td { padding: 0.7rem 0.8rem; vertical-align: middle; font-size: 0.9rem; }
+        .table td .badge { font-weight: 500; padding: 0.4em 0.6em; }
+        .action-link { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        .action-link:hover { text-decoration: underline; }
+        .form-select-sm { padding-top: 0.25rem; padding-bottom: 0.25rem; font-size: 0.8rem; }
+        .status-badge { cursor: default; } /* Make badge non-interactive if needed */
+         .status-dropdown { min-width: 120px; }
+         .filter-form .form-control, .filter-form .form-select { font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-3">
+
+        <div class="page-header">
+            <h1><i class="bi bi-receipt-cutoff"></i>Manage Orders</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('admin_panel') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle"></i> Back to Admin Panel</a>
+            </div>
+        </div>
+
+        {# --- Flash Messages --- #}
+        {% include '_flash_messages.html' %} {# Assumes you have a partial template for flashes #}
+
+        {# --- Filtering/Search Form --- #}
+        <div class="card mb-4">
+            <div class="card-body pb-2">
+                <form method="get" action="{{ url_for('view_orders') }}" class="row g-3 align-items-end filter-form">
+                    <div class="col-md-3">
+                        <label for="status" class="form-label mb-1">Filter by Status</label>
+                        <select name="status" id="status" class="form-select form-select-sm">
+                            <option value="">All Statuses</option>
+                            {% for s in statuses %}
+                            <option value="{{ s }}" {% if s == current_status %}selected{% endif %}>{{ s | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="customer" class="form-label mb-1">Search Customer Name/Email</label>
+                        <input type="text" name="customer" id="customer" class="form-control form-control-sm" placeholder="Enter name or email..." value="{{ customer_filter }}">
+                    </div>
+                     <div class="col-md-3">
+                        <label for="order_id_search" class="form-label mb-1">Search Order ID</label>
+                        <input type="text" name="order_id" id="order_id_search" class="form-control form-control-sm" placeholder="Enter Order ID..." value="{{ order_id_filter }}">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-sm btn-primary w-100"><i class="bi bi-filter"></i> Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {# --- Orders Table --- #}
+        <div class="card">
+            <div class="card-body">
+                 <h5 class="card-title mb-3">Order List <span class="badge bg-secondary ms-2">{{ orders | length }} total</span></h5>
+                 {% if orders %}
+                 <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-center">Items</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('view_order', order_id=order.order_id) }}" class="action-link" title="View Details">
+                                        {{ order.order_id[:8] }}...
+                                    </a>
+                                </td>
+                                <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ order.customer_name }}</td>
+                                <td>{{ order.customer_email }}</td>
+                                <td class="text-end">₹{{ "%.2f"|format(order.total | float) }}</td>
+                                <td class="text-center">{{ order.items | length }}</td>
+                                <td id="status-cell-{{ order.order_id }}">
+                                    {# Status Dropdown for easy update #}
+                                    <select class="form-select form-select-sm status-dropdown" data-order-id="{{ order.order_id }}" onchange="updateOrderStatus(this)">
+                                        {% set valid_statuses = ["pending", "processing", "shipped", "out_for_delivery", "completed", "cancelled"] %} {# Add 'out_for_delivery' #}
+                                        {% for s in valid_statuses %}
+                                        <option value="{{ s }}" {% if s == order.status %}selected{% endif %} class="status-option-{{s}}">
+                                            {{ s | title }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <span id="status-update-spinner-{{ order.order_id }}" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('view_order', order_id=order.order_id) }}" class="btn btn-sm btn-outline-primary py-0 px-1 me-1" title="View Details"><i class="bi bi-eye"></i></a>
+                                    {# Add other actions if needed, e.g., print invoice #}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                 </div>
+
+                  {# --- Pagination (Optional but recommended) --- #}
+                  {# Add pagination controls here if implemented in Flask #}
+                  {# Example:
+                  <nav aria-label="Page navigation">
+                      <ul class="pagination justify-content-center mt-3">
+                          ... pagination links ...
+                      </ul>
+                  </nav>
+                  #}
+
+                 {% else %}
+                     <p class="text-muted text-center mt-3">No orders found matching your criteria.</p>
+                 {% endif %}
+            </div>
+        </div>
+
+    </div>{# End Container #}
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script>
+        // Simple Toast Function (requires Bootstrap JS)
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            const toastId = 'toast-' + Date.now();
+            const toastColor = type === 'danger' ? 'danger' : (type === 'warning' ? 'warning' : 'primary'); // Use primary for success/info
+
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white bg-${toastColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>`;
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+            toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+        }
+
+        function createToastContainer() {
+            let container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            container.style.zIndex = 1080; // Ensure it's above most elements
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // --- AJAX Function for Status Update ---
+        async function updateOrderStatus(selectElement) {
+            const orderId = selectElement.dataset.orderId;
+            const newStatus = selectElement.value;
+            const spinner = document.getElementById(`status-update-spinner-${orderId}`);
+            const originalValue = [...selectElement.options].find(opt => opt.selected).value; // Store original value in case of failure
+
+             // Prevent changing back immediately if already processing
+            if (spinner && spinner.classList.contains('d-inline-block')) {
+                 selectElement.value = originalValue; // Revert UI temporarily
+                 return;
+            }
+
+            if (spinner) spinner.classList.replace('d-none', 'd-inline-block'); // Show spinner
+            selectElement.disabled = true; // Disable dropdown during request
+
+            try {
+                const response = await fetch(`/api/order/${orderId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                        // Add CSRF token header if using Flask-WTF/CSRFProtect
+                        // 'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast(result.message || `Order ${orderId.substring(0, 6)}.. status updated to ${newStatus}.`, 'success');
+                    // Optionally update background color based on status if needed
+                     selectElement.classList.remove('is-invalid');
+                } else {
+                    showToast(result.error || 'Failed to update status.', 'danger');
+                    selectElement.value = originalValue; // Revert dropdown on failure
+                    selectElement.classList.add('is-invalid');
+                }
+
+            } catch (error) {
+                console.error("Error updating status:", error);
+                showToast('Network error or server issue.', 'danger');
+                selectElement.value = originalValue; // Revert dropdown on network error
+                selectElement.classList.add('is-invalid');
+            } finally {
+                if (spinner) spinner.classList.replace('d-inline-block', 'd-none'); // Hide spinner
+                selectElement.disabled = false; // Re-enable dropdown
+            }
+        }
+    </script>
+
+    {# Include a partial for flash messages if you have one #}
+    {# Example: {% include '_flash_messages.html' %} #}
+    {# Make sure you have a toast container for the JS function #}
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100"></div>
+</body>
+</html>

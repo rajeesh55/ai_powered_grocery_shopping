@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Recipes | EFFZEE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .recipe-card {
+        border: none;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        transition: all var(--transition-normal);
+    }
+
+    .recipe-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .recipe-image {
+        height: 200px;
+        object-fit: cover;
+        transition: transform var(--transition-normal);
+    }
+
+    .recipe-card:hover .recipe-image {
+        transform: scale(1.05);
+    }
+
+    .recipe-meta {
+        display: flex;
+        gap: 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .recipe-meta i {
+        color: var(--primary-color);
+    }
+
+    .filters-sidebar {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .dietary-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        backdrop-filter: blur(5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="filters-sidebar">
+                <h5 class="mb-3">Filters</h5>
+                <form action="{{ url_for('recipes') }}" method="get">
+                    <!-- Search -->
+                    <div class="mb-4">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="search" class="form-control" value="{{ search_query }}" placeholder="Search recipes...">
+                    </div>
+                    
+                    <!-- Categories -->
+                    <div class="mb-4">
+                        <label class="form-label">Categories</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}" {{ 'selected' if current_category == category }}>
+                                    {{ category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Dietary Preferences -->
+                    <div class="mb-4">
+                        <label class="form-label">Dietary Preferences</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="vegetarian" id="vegetarian" {{ 'checked' if vegetarian }}>
+                            <label class="form-check-label" for="vegetarian">Vegetarian</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="vegan" id="vegan" {{ 'checked' if vegan }}>
+                            <label class="form-check-label" for="vegan">Vegan</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="gluten_free" id="gluten_free" {{ 'checked' if gluten_free }}>
+                            <label class="form-check-label" for="gluten_free">Gluten Free</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Recipes Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Recipes</h4>
+                <div class="text-muted">
+                    Showing {{ recipes|length }} recipes
+                </div>
+            </div>
+            
+            {% if recipes %}
+                <div class="recipe-grid">
+                    {% for recipe in recipes %}
+                        <div class="card recipe-card">
+                            <img src="{{ recipe.image_url }}" class="recipe-image" alt="{{ recipe.name }}">
+                            {% if recipe.dietary_preferences %}
+                                <span class="dietary-badge">
+                                    {% for pref in recipe.dietary_preferences %}
+                                        <i class="bi bi-check-circle-fill me-1"></i>{{ pref }}
+                                        {% if not loop.last %} • {% endif %}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ recipe.name }}</h5>
+                                <div class="recipe-meta">
+                                    <span><i class="bi bi-clock me-1"></i>{{ recipe.cook_time }} mins</span>
+                                    <span><i class="bi bi-person me-1"></i>{{ recipe.servings }} servings</span>
+                                    <span><i class="bi bi-star-fill me-1"></i>{{ "%.1f"|format(recipe.rating) }}</span>
+                                </div>
+                                <p class="card-text text-muted">{{ recipe.description[:100] }}...</p>
+                                <a href="{{ url_for('recipe_detail', recipe_id=recipe._id) }}" class="btn btn-primary">
+                                    View Recipe
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                    <nav aria-label="Recipe navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {{ 'disabled' if page == 1 }}">
+                                <a class="page-link" href="{{ url_for('recipes', page=page-1, search=search_query, category=current_category) }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% for p in range(1, total_pages + 1) %}
+                                <li class="page-item {{ 'active' if p == page }}">
+                                    <a class="page-link" href="{{ url_for('recipes', page=p, search=search_query, category=current_category) }}">{{ p }}</a>
+                                </li>
+                            {% endfor %}
+                            <li class="page-item {{ 'disabled' if page == total_pages }}">
+                                <a class="page-link" href="{{ url_for('recipes', page=page+1, search=search_query, category=current_category) }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-search display-1 text-muted"></i>
+                    <h4 class="mt-3">No recipes found</h4>
+                    <p class="text-muted">Try adjusting your search or filter criteria</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
